@@ -63,7 +63,7 @@ func readDir(name string, gitIgnoreGlob []*regexp.Regexp) {
 
 
 			if strings.HasPrefix(string(content), "foo:") {
-				fmt.Println(len(gitIgnoreGlob), strings.TrimSpace(string(content)))
+				fmt.Println(len(gitIgnoreGlob), path.Join(name, f.Name()), strings.TrimSpace(string(content)))
 			}
 		}
 	}
