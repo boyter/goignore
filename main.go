@@ -61,10 +61,10 @@ func readDir(name string, gitIgnoreGlob []*regexp.Regexp) {
 		} else {
 			content, _ := ioutil.ReadFile(path.Join(name, f.Name()))
 
-			if len(content) > 10 {
-				content = content[:10]
+
+			if strings.HasPrefix(string(content), "foo:") {
+				fmt.Println(len(gitIgnoreGlob), strings.TrimSpace(string(content)))
 			}
-			fmt.Println(len(gitIgnoreGlob), strings.TrimSpace(string(content)))
 		}
 	}
 }
