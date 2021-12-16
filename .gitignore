@@ -1,2 +1,3 @@
 .idea
-gofilewalk
+goignore
+test_FAIL.txt
