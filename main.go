@@ -30,10 +30,8 @@ func readDir(name string, gitIgnoreGlob []*regexp.Regexp) {
 
 	for _, f := range files {
 		if f.Name() == ".gitignore" || f.Name() == ".ignore" {
-			fmt.Println(">>>", f.Name())
 			content, _ := ioutil.ReadFile(path.Join(name, f.Name()))
 			ignore := parseIgnore(string(content), name)
-
 			gitIgnoreGlob = append(gitIgnoreGlob, ignore...)
 		}
 	}
@@ -52,7 +50,6 @@ func readDir(name string, gitIgnoreGlob []*regexp.Regexp) {
 		}
 
 		if f.IsDir() {
-
 			if f.Name() == ".git" {
 				continue
 			}
@@ -60,7 +57,6 @@ func readDir(name string, gitIgnoreGlob []*regexp.Regexp) {
 			readDir(path.Join(name, f.Name()), gitIgnoreGlob)
 		} else {
 			content, _ := ioutil.ReadFile(path.Join(name, f.Name()))
-
 
 			if strings.HasPrefix(string(content), "foo:") {
 				fmt.Println(len(gitIgnoreGlob), path.Join(name, f.Name()), strings.TrimSpace(string(content)))
