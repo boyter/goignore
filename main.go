@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gobwas/glob"
 	"github.com/lithammer/dedent"
 	"io/fs"
 	"io/ioutil"
@@ -16,7 +17,7 @@ func main() {
 }
 
 // recursively walks all directories starting from this one
-func readDir(name string, gitIgnoreGlob []*regexp.Regexp) {
+func readDir(name string, gitIgnoreGlob []glob.Glob) {
 	d, err := os.Open(name)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -30,7 +31,10 @@ func readDir(name string, gitIgnoreGlob []*regexp.Regexp) {
 
 	for _, f := range files {
 		if f.Name() == ".gitignore" || f.Name() == ".ignore" {
-			content, _ := ioutil.ReadFile(path.Join(name, f.Name()))
+			content, err := ioutil.ReadFile(path.Join(name, f.Name()))
+			if err != nil {
+				fmt.Println(err.Error())
+			}
 			ignore := parseIgnore(string(content), name)
 			gitIgnoreGlob = append(gitIgnoreGlob, ignore...)
 		}
@@ -39,7 +43,7 @@ func readDir(name string, gitIgnoreGlob []*regexp.Regexp) {
 	for _, f := range files {
 		process := true
 		for _, g := range gitIgnoreGlob {
-			if g.MatchString(f.Name()) {
+			if g.Match(f.Name()) {
 				process = false
 				break
 			}
@@ -66,14 +70,16 @@ func readDir(name string, gitIgnoreGlob []*regexp.Regexp) {
 }
 
 
-func parseIgnore(content string, directory string) []*regexp.Regexp {
+func parseIgnore(content string, directory string) []glob.Glob {
 	globPatterns := GlobifyGitIgnore(content, directory)
 
-	var compiledGlob []*regexp.Regexp
+	var compiledGlob []glob.Glob
 	for _, s := range globPatterns {
-		compiled, err := regexp.Compile(s)
+		compiled, err := glob.Compile(s)
 		if err == nil {
 			compiledGlob = append(compiledGlob, compiled)
+		} else {
+			fmt.Println(err.Error())
 		}
 	}
 
